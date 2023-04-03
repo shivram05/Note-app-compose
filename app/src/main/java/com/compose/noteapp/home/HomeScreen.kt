@@ -27,39 +27,36 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 
-private enum class PopupState{
+private enum class PopupState {
 
-    OPEN,CLOSE,EDIT
+    OPEN, CLOSE, EDIT
 }
-
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(
-    homeViewModel: HomeViewModelAbstract
+    homeViewModel: HomeViewModelAbstract,
+    onClickNote : (NoteEntity)->Unit
 ) {
 
     val itemListState = homeViewModel.noteListFlow.collectAsState(initial = listOf())
 
-    val textState = remember{ mutableStateOf("") }
-    val noteIdState:MutableState<Long?> = rememberSaveable{ mutableStateOf(null) }
-    val popupState = rememberSaveable{ mutableStateOf(PopupState.CLOSE) }
+    val textState = remember { mutableStateOf("") }
+    val noteIdState: MutableState<Long?> = rememberSaveable { mutableStateOf(null) }
+    val popupState = rememberSaveable { mutableStateOf(PopupState.CLOSE) }
 
 
-    Scaffold {
-        LazyColumn {
+    Scaffold() {
+        LazyColumn(
+            modifier = Modifier.padding(it)
+        ) {
             items(itemListState.value.size) { index ->
                 val note = itemListState.value[index]
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {
-                            noteIdState.value = note.id
-                            textState.value = note.text
-                            popupState.value = PopupState.EDIT
-                        }
-                        .pointerInput(Unit){
+                        .pointerInput(Unit) {
                             detectTapGestures(
                                 onLongPress = {
 //                                    delete the note on long press
@@ -68,6 +65,15 @@ fun HomeScreen(
                                 }
                             )
                         }
+                        .clickable {
+                            noteIdState.value = note.id
+                            textState.value = note.text
+//                            popupState.value = PopupState.EDIT
+//                            navigate to other screen
+                            println("clicked data")
+                            onClickNote(note)
+                        }
+
                         .height(54.dp)
                 ) {
                     Text(
@@ -77,11 +83,14 @@ fun HomeScreen(
                         text = note.text,
                         maxLines = 1
                     )
-                    Spacer(modifier = Modifier
-                        .height(1.dp)
-                        .fillMaxWidth()
-                        .background(color = Color.Gray).alpha(0.54f)
-                        .align(Alignment.BottomCenter))
+                    Spacer(
+                        modifier = Modifier
+                            .height(1.dp)
+                            .fillMaxWidth()
+                            .background(color = Color.Gray)
+                            .alpha(0.54f)
+                            .align(Alignment.BottomCenter)
+                    )
                 }
             }
             item {
@@ -89,7 +98,7 @@ fun HomeScreen(
                     Button(
                         modifier = Modifier.align(Alignment.Center),
                         onClick = {
-                           popupState.value = PopupState.OPEN
+                            popupState.value = PopupState.OPEN
                         }) {
                         Text(text = stringResource(id = R.string.screen_home_button_add_note_text))
                     }
@@ -97,8 +106,8 @@ fun HomeScreen(
             }
         }
 
-        when(popupState.value){
-            PopupState.OPEN->{
+        when (popupState.value) {
+            PopupState.OPEN -> {
 
                 NotePopup(
                     onClickDismiss = {
@@ -110,18 +119,20 @@ fun HomeScreen(
                     }
                 )
             }
-            PopupState.CLOSE->{}
+            PopupState.CLOSE -> {}
 
-            PopupState.EDIT->{
-//                print(textState.value)
+            PopupState.EDIT -> {
                 NotePopup(
                     text = textState.value,
                     onClickDismiss = {
                         popupState.value = PopupState.CLOSE
                     },
                     onClickSave = {
-                        homeViewModel.updateNote(noteEntity = NoteEntity(
-                            id = noteIdState.value,text = it))
+                        homeViewModel.updateNote(
+                            noteEntity = NoteEntity(
+                                id = noteIdState.value, text = it
+                            )
+                        )
                         popupState.value = PopupState.CLOSE
                     }
                 )
@@ -161,7 +172,8 @@ fun HomeScreenPreview() {
                     TODO("Not yet implemented")
                 }
 
-            }
+            },
+            onClickNote = {}
         )
     }
 }

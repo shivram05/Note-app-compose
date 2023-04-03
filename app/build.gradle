@@ -60,6 +60,9 @@ dependencies {
 
     // hilt di
     implementation "com.google.dagger:hilt-android:$hilt_version"
+//    for testing dependencies
+    implementation 'androidx.test:core-ktx:1.4.0'
+    implementation 'androidx.test.ext:junit-ktx:1.1.5'
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
 
     // Room persistence library
@@ -76,6 +79,11 @@ dependencies {
     // unit tests
     testImplementation 'junit:junit:4.13.2'
 
+    // Google Truth
+    testImplementation  "com.google.truth:truth:$truth_version"
+
+    //Room test helpers
+    testImplementation "androidx.room:room-testing:$room_version"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
