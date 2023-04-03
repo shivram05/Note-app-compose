@@ -3,6 +3,7 @@ package com.compose.data
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
 import androidx.room.Update
 import com.compose.model.NoteEntity
@@ -14,7 +15,7 @@ interface NoteDAO {
     @Query("SELECT * FROM note")
     fun getAll():Flow<List<NoteEntity>>
 
-    @Insert
+    @Insert(onConflict = REPLACE)
     suspend fun insert(noteEntity: NoteEntity)
 
     @Delete

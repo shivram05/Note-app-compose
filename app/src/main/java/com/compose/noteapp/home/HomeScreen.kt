@@ -3,6 +3,7 @@ package com.compose.noteapp.home
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
@@ -13,7 +14,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -56,6 +59,15 @@ fun HomeScreen(
                             textState.value = note.text
                             popupState.value = PopupState.EDIT
                         }
+                        .pointerInput(Unit){
+                            detectTapGestures(
+                                onLongPress = {
+//                                    delete the note on long press
+                                    println("data is lcikec")
+                                    homeViewModel.deleteNote(note)
+                                }
+                            )
+                        }
                         .height(54.dp)
                 ) {
                     Text(
@@ -67,7 +79,8 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier
                         .height(1.dp)
-                        .background(color = Color.Gray.copy(alpha = 0.54f))
+                        .fillMaxWidth()
+                        .background(color = Color.Gray).alpha(0.54f)
                         .align(Alignment.BottomCenter))
                 }
             }
