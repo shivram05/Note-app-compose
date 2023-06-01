@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.compose.noteapp.home.HomeScreen
+import com.compose.noteapp.home.NoteScreen
 import com.compose.noteapp.ui.theme.NoteAppTheme
 import com.compose.viewmodel.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,15 +45,18 @@ class MainActivity : ComponentActivity() {
                                     onClickNote = {
                                         navController.navigate(Screen.NOTE.name)
                                     },
+                                    onClickAddNote = {
+                                        navController.navigate(Screen.NOTE.name)
+                                    }
                                 )
                             }
 
                             composable(Screen.NOTE.name) {
-                                Scaffold {
-                                    Text(
-                                        modifier = Modifier.padding(it), text = "Note Scree"
-                                    )
-                                }
+
+                               NoteScreen(viewModel = homeViewModel,
+                               onClickClose = {
+                                   navController.popBackStack()
+                               })
                             }
                         })
                 }

@@ -37,7 +37,8 @@ private enum class PopupState {
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModelAbstract,
-    onClickNote : (NoteEntity)->Unit
+    onClickNote : (NoteEntity)->Unit,
+    onClickAddNote : ()->Unit
 ) {
 
     val itemListState = homeViewModel.noteListFlow.collectAsState(initial = listOf())
@@ -47,7 +48,7 @@ fun HomeScreen(
     val popupState = rememberSaveable { mutableStateOf(PopupState.CLOSE) }
 
 
-    Scaffold() {
+    Scaffold {
         LazyColumn(
             modifier = Modifier.padding(it)
         ) {
@@ -71,6 +72,7 @@ fun HomeScreen(
 //                            popupState.value = PopupState.EDIT
 //                            navigate to other screen
                             println("clicked data")
+                            homeViewModel.selectNote(note)
                             onClickNote(note)
                         }
 
@@ -98,7 +100,9 @@ fun HomeScreen(
                     Button(
                         modifier = Modifier.align(Alignment.Center),
                         onClick = {
-                            popupState.value = PopupState.OPEN
+//                            popupState.value = PopupState.OPEN
+                            homeViewModel.resetSelectedNote()
+                            onClickAddNote()
                         }) {
                         Text(text = stringResource(id = R.string.screen_home_button_add_note_text))
                     }
@@ -114,7 +118,7 @@ fun HomeScreen(
                         popupState.value = PopupState.CLOSE
                     },
                     onClickSave = {
-                        homeViewModel.addNote(noteEntity = NoteEntity(text = it))
+                        homeViewModel.addOrUpdateNote(noteEntity = NoteEntity(text = it))
                         popupState.value = PopupState.CLOSE
                     }
                 )
@@ -159,8 +163,10 @@ fun HomeScreenPreview() {
                             NoteEntity(text = "Note 6")
                         )
                     )
+                override val selectedNoteState: State<NoteEntity?>
+                    get() = mutableStateOf(null)
 
-                override fun addNote(noteEntity: NoteEntity) {
+                override fun addOrUpdateNote(noteEntity: NoteEntity) {
                     TODO("Not yet implemented")
                 }
 
@@ -172,8 +178,18 @@ fun HomeScreenPreview() {
                     TODO("Not yet implemented")
                 }
 
+                override fun selectNote(noteEntity: NoteEntity) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun resetSelectedNote() {
+                    TODO("Not yet implemented")
+                }
+
             },
-            onClickNote = {}
+            onClickNote = {},
+            onClickAddNote = {}
+
         )
     }
 }

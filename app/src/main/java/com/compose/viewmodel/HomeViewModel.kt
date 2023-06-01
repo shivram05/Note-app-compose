@@ -1,5 +1,8 @@
 package com.compose.viewmodel
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.compose.data.repository.NoteRepository
 import com.compose.model.NoteEntity
@@ -14,9 +17,15 @@ interface HomeViewModelAbstract {
 
     val noteListFlow: Flow<List<NoteEntity>>
 
-    fun addNote(noteEntity: NoteEntity)
+    val selectedNoteState : State<NoteEntity?>
+    fun addOrUpdateNote(noteEntity: NoteEntity)
     fun updateNote(noteEntity: NoteEntity)
     fun deleteNote(noteEntity: NoteEntity)
+
+    fun selectNote(noteEntity: NoteEntity)
+
+    fun resetSelectedNote()
+
 }
 
 @HiltViewModel
@@ -26,12 +35,23 @@ class HomeViewModel
 
     private val ioScope = CoroutineScope(Dispatchers.IO)
 
+    private val _selectedNoteState : MutableState<NoteEntity?> = mutableStateOf(null)
+
+    override val selectedNoteState: State<NoteEntity?>
+        get() = _selectedNoteState
+
+
     override val noteListFlow: Flow<List<NoteEntity>>
         get() = noteRepository.getAllFlowData()
 
-    override fun addNote(noteEntity: NoteEntity) {
+
+    override fun addOrUpdateNote(noteEntity: NoteEntity) {
         ioScope.launch {
-            noteRepository.insertData(noteEntity)
+            if (noteEntity.id == null) {
+                noteRepository.insertData(noteEntity)
+            } else {
+                noteRepository.upateData(noteEntity)
+            }
         }
 
     }
@@ -50,4 +70,11 @@ class HomeViewModel
         }
     }
 
+    override fun selectNote(noteEntity: NoteEntity) {
+        _selectedNoteState.value = noteEntity
+    }
+
+    override fun resetSelectedNote() {
+        _selectedNoteState.value = null
+    }
 }
